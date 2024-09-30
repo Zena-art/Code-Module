@@ -26,7 +26,18 @@ class InputHandler {
     }
 }
 class Projectile {
-
+    constructor(game, x, y){
+      this.game = game;
+      this.x = x;
+      this.y = y;
+      this.width = 10;
+      this.height = 3;
+      this.speed = 3;
+      this.markedForDeletion = false;
+    }
+    update(){
+      
+    }
 }
 class Particle {
 
@@ -39,8 +50,12 @@ class Player {
       this.x = 20;
       this.y = 100;
       this.speedY = 0;
+      this.maxSpeed = 2;
     }
     update(){
+      if(this.game.keys.includes('ArrowUp')) this.speedY = -this.maxSpeed;
+      else if (this.game.keys.includes('ArrowDown')) this.speedY = this.maxSpeed;
+      else this.speedY = 0;
       this.y += this.speedY;
     }
     draw(context){
