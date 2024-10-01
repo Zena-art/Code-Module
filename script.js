@@ -87,7 +87,30 @@ class Player {
     }
 }
 class Enemy {
+  constructor(game){
+    this.game = game;
+    this.x = this.game.width;
+    this.speedX = Math.random() * -1.5 - 0.5;
+    this.markedForDeletion = false;
+  }
+  update(){
+    this.x += this.speedX;
+    if(this.x + this.width < 0) this.markedForDeletion = true;
 
+  }
+  draw(context){
+    context.fillStyle = "red";
+    context.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+}
+class Angler1 extends Enemy{
+  constructor(game){
+    super(game);
+    this.widht = 228;
+    this.height = 169;
+    this.y = Math.random() * (this.game.height * 0.9 - this.height);
+  }
 }
 class Layer {
 
@@ -101,7 +124,7 @@ class UI {
     this.game = game;
     this.fontSize = 25;
     this.fontFamily = "Helvetica";
-    this.color = 'white';
+    this.color = 'yellow';
   }
   draw(context){
     // ammo
