@@ -99,7 +99,7 @@ class Enemy {
 
   }
   draw(context){
-    context.fillStyle = "red";
+    context.fillStyle = 'red';
     context.fillRect(this.x, this.y, this.width, this.height);
   }
 
@@ -107,8 +107,8 @@ class Enemy {
 class Angler1 extends Enemy{
   constructor(game){
     super(game);
-    this.widht = 228;
-    this.height = 169;
+    this.width = 228 * 0.2;
+    this.height = 169 * 0.2;
     this.y = Math.random() * (this.game.height * 0.9 - this.height);
   }
 }
@@ -142,10 +142,14 @@ class Game {
     this.input = new InputHandler(this);
     this.ui = new UI(this);
     this.keys = [];
+    this.enemies = [];
+    this.enemyTimer = 0;
+    this.enemyInterval = 1000;
     this.ammo = 20;
     this.maxAmmo = 50;
     this.ammoTimer = 0;
     this.ammoInterval = 500;
+    this.gameOver = false;
   }
   update(deltaTime){
     this.player.update();
@@ -155,10 +159,36 @@ class Game {
     }else {
       this.ammoTimer += deltaTime;
     }
+    this.enemies.forEach(enemy => {
+      enemy.update();
+      if (this.checkCollision(this.player, enemy)){
+        enemy.markedForDeletion = true;
+      }
+    });
+    this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
+    if(this.enemyTimer > this.enemyInterval && !this.gameOver) {
+        this.addEnemy();
+        this.enemyTimer = 0;
+    }else {
+      this.enemyTimer += deltaTime;
+    }
   }
   draw(context){
     this.player.draw(context);
     this.ui.draw(context);
+    this.enemies.forEach(enemy => {
+      enemy.draw(context);
+    });
+  }
+  addEnemy(){
+    this.enemies.push(new Angler1(this));
+  }
+  checkCollision(rect1, rect2){
+    return ( rect1.x < rect2.x + rect2.width && 
+             rect1.x + rect1.width > rect2.x &&
+             rect1.y < rect2.y + rect2.height &&
+             rect1.height + rect1.y > rect2.y
+    )
   }
 }
 const game = new Game(canvas.width, canvas.height);
@@ -170,7 +200,7 @@ function animate(timeStamp){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   game.update(deltaTime);
   game.draw(ctx);
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animate); 
 }
 animate(0);
 });
