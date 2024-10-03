@@ -118,6 +118,19 @@ class Angler1 extends Enemy{
   }
 }
 class Layer {
+  constructor(game, image, speedModifier){
+    this.game = game;
+    this.image = image;
+    this.speedModifier = speedModifier;
+    this.width = 1768;
+    this.height = 500;
+    this.x = 0;
+    this.y = 0;
+  }
+  update(){
+    if(this.x <= -this.width) this.x = 0;
+    else this.x -= this.game.speed * this.speedModifier;
+  }
 
 
 }
@@ -133,10 +146,10 @@ class UI {
   }
   draw(context){
     context.save();
+    context.fillStyle = this.color;
     context.shadowOffsetX = 2;
     context.shadowOffsetY = 2;
     context.shadowColor = 'black';
-    context.fillStyle = this.color;
     context.font = this.fontSize + 'px' + this.fontFamily;
     //score
     context.fillText('Score: ' + this.game.score, 20, 40);
@@ -144,6 +157,9 @@ class UI {
     for(let i = 0; i < this.game.ammo; i++){
       context.fillRect(20 + 5 * i, 50, 3, 20);
     }
+    // timer
+    const formattedTime = (this.game.gameTime * 0.001).toFixed(1);
+    context.fillText('Timer: ' + formattedTime, 20, 100);
     // game over messages
     if(this.game.gameOver){
       context.textAlign = 'center';
@@ -157,9 +173,9 @@ class UI {
         message2 = 'Try again next time';
       }
       context.font = '50px ' + this.fontFamily;
-      context.fillText(message1, this.game.width * 0.5, this.game.height * 0.5);
+      context.fillText(message1, this.game.width * 0.5, this.game.height * 0.5 - 40);
       context.font = '25px ' + this.fontFamily;
-      context.fillText(message2, this.game.width * 0.5, this.game.height * 0.5);
+      context.fillText(message2, this.game.width * 0.5, this.game.height * 0.5 + 40);
     }
     context.restore();
   }
@@ -182,8 +198,13 @@ class Game {
     this.gameOver = false;
     this.score = 0;
     this.winningScore = 10;
+    this.gameTime = 0;
+    this.timeLimit = 5000;
+    this.speed = 1;
   }
   update(deltaTime){
+    if(!this.gameOver) this.gameTime += deltaTime;
+    if(this.gameTime > this.timeLimit) this.gameOver = true;
     this.player.update();
     if(this.ammoTimer > this.ammoInterval) {
       if (this.ammo < this.maxAmmo) this.ammo++;
@@ -203,6 +224,7 @@ class Game {
           if(enemy.lives <= 0){
             enemy.markedForDeletion = true;
             this.score += enemy.score;
+            if(!this.gameOver)this.score += enemy.score;
             if( this.score > this.winningScore) this.gameOver = true;
           }
         }
