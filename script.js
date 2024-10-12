@@ -45,11 +45,21 @@ class Projectile {
       if (this.x > this.game.width * 0.8) this.markedForDeletion = true;
     }
     draw(context){
-      context.fillStyle = 'yellow';
-      context.fillRect(this.x, this.y, this.width, this.height);
+     context.drawImage(this.image, this.x, this.y);
     }
 }
 class Particle {
+  constructor(game, x, y){
+    this.game = game;
+    this.x = x;
+    this.y = y;
+    this.image = document.getElementById('gears');
+    this.size = Math.random() * 10 + 10;
+    this.speed = Math.random() * 4 + 2;
+    this.markedForDeletion = false;
+
+    
+  }
 
 }
 class Player {
@@ -76,6 +86,9 @@ class Player {
       else if (this.game.keys.includes('ArrowDown')) this.speedY = this.maxSpeed;
       else this.speedY = 0;
       this.y += this.speedY;
+      // vertical boundaries
+      if(this.y > this.game.height - this.height * 0.5) this.y = this.game.height * 0.5;
+      else if (this.y < -this.height * 0.5) this.y = -this.height * 0.5;
       // handle projectiles
       this.projectiles.forEach(projectile => {
         projectile.update();
@@ -148,8 +161,10 @@ class Enemy {
   draw(context){
     if (this.game.debug) context.strokeRect(this.x, this.y, this.width, this.height);
     context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-    context.font = '20px Helvetica';
-    context.fillText(this.lives, this.x, this.y);
+    if(this.game.debug){
+      context.font = '20px Helvetica';
+      context.fillText(this.lives, this.x, this.y);
+    }
   }
 
 }
@@ -238,7 +253,7 @@ class UI {
   constructor(game){
     this.game = game;
     this.fontSize = 25;
-    this.fontFamily = "Helvetica";
+    this.fontFamily = "Bangers";
     this.color = 'white';
   }
   draw(context){
@@ -266,10 +281,10 @@ class UI {
         message1 = 'You lose!';
         message2 = 'Try again next time';
       }
-      context.font = '50px ' + this.fontFamily;
-      context.fillText(message1, this.game.width * 0.5, this.game.height * 0.5 - 40);
+      context.font = '100px ' + this.fontFamily;
+      context.fillText(message1, this.game.width * 0.5, this.game.height * 0.5 - 20);
       context.font = '25px ' + this.fontFamily;
-      context.fillText(message2, this.game.width * 0.5, this.game.height * 0.5 + 40);
+      context.fillText(message2, this.game.width * 0.5, this.game.height * 0.5 + 20);
     }
      //ammo
      if(this.game.player.poweUp)context.fillStyle = this.color = '#ffffbd';
